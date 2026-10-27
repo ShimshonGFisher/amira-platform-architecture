@@ -55,6 +55,7 @@ export async function retrieveKnowledgeBlock(
         SELECT id, ROW_NUMBER() OVER (ORDER BY ts_rank_cd(fts, query) DESC) AS rank
         FROM tenant_knowledge, websearch_to_tsquery('english', ${q}) AS query
         WHERE tenant_id = ${tenantId} AND fts @@ query
+        ORDER BY rank
         LIMIT 30
       )
       SELECT k.title, k.content,
