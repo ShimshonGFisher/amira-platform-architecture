@@ -1,0 +1,18 @@
+[package]
+name = "amira-embedder"
+version = "0.1.0"
+edition = "2024"
+description = "Tiny local embedding sidecar for Amira RAG — bge-small-en-v1.5 over a Unix socket"
+
+[dependencies]
+axum = "0.8"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "signal"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+fastembed = "4"
+anyhow = "1"
+
+# Right-sized for a 2 vCPU / 3.8 GB box: lighter codegen than the default release profile.
+[profile.release]
+opt-level = 2
+codegen-units = 16

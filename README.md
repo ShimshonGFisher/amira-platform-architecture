@@ -3,7 +3,7 @@
 AMIRA is a multi-tenant AI concierge that I build and run for service businesses.
 One deployment serves many businesses across WhatsApp, Instagram and Messenger, a
 web chat widget, and voice. This repo publishes the retrieval core as a reference:
-hybrid search inside Postgres, the client for a Rust embedding sidecar, and a
+hybrid search inside Postgres, the Rust embedding sidecar that serves it, and a
 prompt layout that keeps prompt caching effective.
 
 ## Architecture
@@ -80,9 +80,17 @@ query, including both retrieval arms, filters on it.
 | `core-logic/knowledge.ts` | Hybrid retrieval (RRF), knowledge ingestion, idempotent reindex |
 | `core-logic/embeddings.ts` | TypeScript client for the sidecar over a Unix socket |
 | `core-logic/KNOWLEDGE_RAG.md` | Design note for the per-tenant knowledge base |
+| `embedder/` | The Rust embedding sidecar (axum + fastembed) |
 
-The rest of the platform, including the Rust sidecar, lives in private repos:
-channel adapters for WhatsApp,
+To run the sidecar:
+
+```bash
+cargo build --release --manifest-path embedder/Cargo.toml
+EMBED_SOCKET=/run/amira-embed.sock ./embedder/target/release/amira-embedder
+# GET /health, POST /embed {"input": ["..."]} over the Unix socket
+```
+
+The rest of the platform lives in a private repo: channel adapters for WhatsApp,
 Instagram and Messenger and the web widget, the voice path (OpenAI Realtime over
 WebRTC with short-lived session tokens), lead capture and handover to humans, and
 the admin studio. Happy to walk through it.
